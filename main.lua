@@ -267,9 +267,6 @@ function AddPlayerData(player)
                 scale = nil,
             }
         },
-        UI = {
-            --
-        }
     }
 end
 
@@ -439,14 +436,14 @@ function ShowBuilds(callback)
 end
 
 function LoadBuild(callback)
-    local playerId = callback.playerId
     local buildName = callback.value
-    local playerData = playerDataTable[playerId]
-    local Builder = playerData.Builder
     local data = ReadDynamicFile(buildName)
     if data == nil or data == '' then
         return
     end
+    local playerId = callback.playerId
+    local playerData = playerDataTable[playerId]
+    local Builder = playerData.Builder
     for i, object in ipairs(data) do
         local model = object.model
         local transform = object.transform
