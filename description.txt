@@ -1,0 +1,10 @@
+Quick Construction lets you create simple architectural marvels at light speed! 
+Quickly construct your builds by moving a Cursor around the world to help you visualize prop placement with grid-snapping.
+
+How to use:
+use the ARROW keys to move Cursor around the world
+use Page Up and Page Down to raise/lower the Cursor
+press ENTER to Place a prop
+press E to rotate the build around the Origin
+press O to move the build Origin to the Cursor
+press Y to reset the Cursor to the Origin
