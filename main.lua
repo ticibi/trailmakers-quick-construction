@@ -1,6 +1,5 @@
---- ProjectX ---
---- Simple and Easy snap builder ---
---- created by ticibi/dinoman ---
+--- Quick Construction ---
+--- created by ticibi, dinoman, 2022 ---
 
 local debug = false
 local savedBuildPath = "MyBuilds"
@@ -398,10 +397,10 @@ function Save(callback)
     if playerData.saveName == nil then
         playerData.saveName = "build "..#playerData.savedBuilds + 1
     end
+    playerData.isBuilding = false
     SaveData(playerData.saveName, Builder.objects)
     table.overwrite(playerData.savedBuilds, playerData.saveName)
     WriteDynamicFile(savedBuildPath, playerData.savedBuilds)
-    playerData.isBuilding = false
     HomePage(callback.playerId)
 end
 
