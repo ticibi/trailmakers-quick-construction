@@ -397,7 +397,8 @@ end
 function OnDebugSpawnGroup(callback)
     local Cursor = playerDataTable[callback.playerId].Cursor
     local startPos = Cursor.pos
-    for i, material in ipairs(GetMaterialsCategory(callback.value)) do
+    local materials = GetMaterialsCategory(callback.value)
+    for i, material in ipairs(materials) do
         local newPos = tm.vector3.Create(startPos.x + material.scale.x, startPos.y, startPos.z)
         startPos = newPos
         tm.physics.SpawnObject(newPos, material.model)
@@ -428,7 +429,8 @@ function StartBuilding(callback)
         return
     end
     if playerData.Cursor.pos == nil then
-        InitializeCursor(playerData.Cursor, GetPlayerPos(playerId))
+        local playerPos = GetPlayerPos(playerId)
+        InitializeCursor(playerData.Cursor, playerPos)
     end
     playerData.isBuilding = true
     HomePage(playerId)
@@ -462,10 +464,13 @@ function LoadBuild(callback)
     for i, object in ipairs(data) do
         local model = object.model
         local transform = object.transform
-        local spawnedObject = SpawnProp(TableToVector(transform.pos), model)
+        local positionVector = TableToVector(transform.pos)
+        local spawnedObject = SpawnProp(positionVector, model)
         local spawnedTransform = spawnedObject.GetTransform()
-        spawnedTransform.SetRotation(tm.quaternion.Create(TableToVector(transform.rot)))
-        spawnedTransform.SetScale(TableToVector(transform.scale))
+        local rotationVector = TableToVector(transform.rot)
+        spawnedTransform.SetRotation(tm.quaternion.Create(rotationVector))
+        local scaleVector = TableToVector(transform.scale)
+        spawnedTransform.SetScale(scaleVector)
         local objectData = MakeObject(spawnedObject, model)
         table.insert(Builder.objects, objectData)
         table.insert(Builder.history, {action="place", object=objectData})
@@ -484,8 +489,9 @@ end
 
 function OnCancelBuild(callback)
     local playerData = playerDataTable[callback.playerId]
+    local playerPos = GetPlayerPos(callback.playerId)
     DeleteAllObjects(playerData.Builder)
-    ResetCursor(playerData.Cursor, GetPlayerPos(callback.playerId))
+    ResetCursor(playerData.Cursor, playerPos)
     playerData.isBuilding = false
     playerData.saveName = nil
     HomePage(callback.playerId)
