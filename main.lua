@@ -78,7 +78,7 @@ function CreateMaterials()
     InitializeMaterial('magnetic cube', 'PFB_MagneticCube', 'construction', {x=5, y=1, z=10})
     InitializeMaterial('explosive crate', 'PFB_ExplosiveCrate', 'crates', {x=2, y=2, z=2})
     InitializeMaterial('explosive barrel', 'PFB_ExplosiveBarrel', 'barrels', {x=2, y=3, z=2})
-    InitializeMaterial('concrete wall', 'PFB_Dispensable-ConcreteWall', 'construction', {x=2, y=2, z=3.1}, false, true)
+    InitializeMaterial('concrete wall', 'PFB_Dispensable-ConcreteWall', 'construction', {x=2, y=2, z=3.5}, true, true)
     InitializeMaterial('blue shipping container', 'PFB_Container_Blue', 'crates', {x=4, y=1.8, z=9}, false, true)
     InitializeMaterial('dynamic blue shipping container', 'PFB_Container_Blue_Dynamic', 'crates', {x=4, y=1.8, z=9}, false, true)
     InitializeMaterial('orange shipping container', 'PFB_Container_Orange', 'crates', {x=4, y=1.8, z=9}, false, true)
@@ -114,100 +114,100 @@ function CreateMaterials()
     InitializeMaterial('coral reef 3', 'PFB_CoralReef3', 'ocean', {x=25, y=15, z=25})
     InitializeMaterial('shipwreck', 'PFB_ShipWreck', 'ocean', {x=85, y=25 , z=30})
 
-    InitializeMaterial('desert bush fir', 'PFB_Desert_Bush_Fir', 'trees', {x=1, y=1, z=1})
+    InitializeMaterial('desert bush fir', 'PFB_Desert_Bush_Fir', 'trees', {x=3, y=3, z=3})
     InitializeMaterial('lush fat pine', 'PFB_Tall__Lush_FatPine_1', 'trees', {x=1, y=1, z=1})
     InitializeMaterial('slender pine 1', 'PFB_Tall_SlenderPine_1', 'trees', {x=1, y=1, z=1})
-    InitializeMaterial('slender pine 2', 'PFB_Tall__Pruny_SlenderPine_2', 'trees', {x=1, y=1, z=1})
+    InitializeMaterial('slender pine 2', 'PFB_Tall__Pruny_SlenderPine_2', 'trees', {x=1.5, y=1, z=1.5})
     InitializeMaterial('palm 1', 'PFB_Palm1', 'trees', {x=1, y=1, z=1})
     InitializeMaterial('palm 2', 'PFB_Palm2', 'trees', {x=1, y=1, z=1})
-    InitializeMaterial('bulky pine fbx', 'PFB_BulkyPineTree_FBX', 'trees', {x=1, y=1, z=1})
+    InitializeMaterial('bulky pine fbx', 'PFB_BulkyPineTree_FBX', 'trees', {x=4, y=1, z=4})
     InitializeMaterial('slender pine fbx', 'PFB_SlenderPineTree-Final_FBX', 'trees', {x=1, y=1, z=1})
-    InitializeMaterial('charred stump', 'PFB_CharredStump', 'trees', {x=1, y=1, z=1})
-    InitializeMaterial('charred tree 1', 'PFB_CharredTree', 'trees', {x=1, y=1, z=1})
-    InitializeMaterial('charred tree 2', 'PFB_CharredTree2', 'trees', {x=1, y=1, z=1})
+    InitializeMaterial('charred stump', 'PFB_CharredStump', 'trees', {x=1.5, y=1, z=1.5})
+    InitializeMaterial('charred tree 1', 'PFB_CharredTree', 'trees', {x=1.5, y=1, z=1.5})
+    InitializeMaterial('charred tree 2', 'PFB_CharredTree2', 'trees', {x=1.5, y=1, z=1.5})
     InitializeMaterial('charred bush', 'PFB_CharredBush', 'trees', {x=1, y=1, z=1})
 
-    InitializeMaterial('bush', 'PFB_Bushy', 'plants', {x=1, y=1, z=1})
+    InitializeMaterial('bush', 'PFB_Bushy', 'plants', {x=6, y=1, z=6})
     InitializeMaterial('charred bush', 'PFB_CharredBush', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('big palm fern', 'PFB_PalmFern_Big', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('medium palm fern', 'PFB_PalmFern_Medium', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('blueberry bush 1', 'PFB_BlueBerryShrub_01', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('blueberry bush 2', 'PFB_BlueBerryShrub_02_Noco', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('pine bush', 'PFB_Pine_Bush', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('pine bush test', 'PFB_Pine_Bush_TEST', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('mine plant', 'PFB_Mine', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('cactus ball', 'PFB_Cactus_Ball', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('cactus bush', 'PFB_Cactus_Bush', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('cactus bush populate', 'PFB_Cactus_Bush_Populate', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('mini cactus', 'PFB_Cactus_Mini', 'plants', {x=1, y=1, z=1})
+    InitializeMaterial('big palm fern', 'PFB_PalmFern_Big', 'plants', {x=4.5, y=1, z=4.5})
+    InitializeMaterial('medium palm fern', 'PFB_PalmFern_Medium', 'plants', {x=4, y=1, z=4})
+    InitializeMaterial('blueberry bush 1', 'PFB_BlueBerryShrub_01', 'plants', {x=7, y=1, z=7})
+    InitializeMaterial('blueberry bush 2', 'PFB_BlueBerryShrub_02_Noco', 'plants', {x=5, y=1, z=5})
+    InitializeMaterial('pine bush', 'PFB_Pine_Bush', 'plants', {x=3, y=1, z=3})
+    InitializeMaterial('pine bush test', 'PFB_Pine_Bush_TEST', 'plants', {x=7.5, y=1, z=8.5})
+    InitializeMaterial('mine plant', 'PFB_Mine', 'plants', {x=2, y=1, z=2})
+    InitializeMaterial('cactus ball', 'PFB_Cactus_Ball', 'plants', {x=4, y=1, z=4})
+    InitializeMaterial('cactus bush', 'PFB_Cactus_Bush', 'plants', {x=4.5, y=1, z=4.5})
+    InitializeMaterial('cactus bush populate', 'PFB_Cactus_Bush_Populate', 'plants', {x=4.5, y=1, z=4.5})
+    InitializeMaterial('mini cactus', 'PFB_Cactus_Mini', 'plants', {x=0.5, y=1, z=0.5})
     InitializeMaterial('small cactus', 'PFB_Cactus_Small', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('cactus star', 'PFB_Cactus_Star_Plant', 'plants', {x=1, y=1, z=1})
+    InitializeMaterial('cactus star', 'PFB_Cactus_Star_Plant', 'plants', {x=2, y=1, z=2})
     InitializeMaterial('cactus tree', 'PFB_Cactus_Tree', 'plants', {x=1, y=1, z=1})
-    InitializeMaterial('cactus mushroom tree', 'PFB_Cactus_Mushroom_Tree', 'plants', {x=1, y=1, z=1})
+    InitializeMaterial('cactus mushroom tree', 'PFB_Cactus_Mushroom_Tree', 'plants', {x=18, y=1, z=18})
 
     InitializeMaterial('salvage', 'PFB_SalvageItem', 'salvage', {x=1, y=1, z=1})
     InitializeMaterial('small salvage', 'PFB_SalvageItem_Small', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('salvage ball', 'PFB_SalvageItem_Ball', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('medium salvage', 'PFB_SalvageItem_M Variant', 'salvage', {x=1.5, y=1.5, z=1.5})
-    InitializeMaterial('medium salvage ball', 'PFB_SalvageItem_Ball_M', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('large salvage ball', 'PFB_SalvageItem_Ball_L', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('extra large salvage', 'PFB_SalvageItem_XL Variant', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('compound 1', 'PFB_SalvageItem_Compound_Variant_1', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('compound 2', 'PFB_SalvageItem_Compound_Variant_2', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('compound 3', 'PFB_SalvageItem_Compound_3', 'salvage', {x=1, y=1, z=1})
+    InitializeMaterial('salvage ball', 'PFB_SalvageItem_Ball', 'salvage', {x=1.5, y=1, z=1.5})
+    InitializeMaterial('medium salvage', 'PFB_SalvageItem_M Variant', 'salvage', {x=2, y=1, z=2})
+    InitializeMaterial('medium salvage ball', 'PFB_SalvageItem_Ball_M', 'salvage', {x=3.25, y=1, z=3.25})
+    InitializeMaterial('large salvage ball', 'PFB_SalvageItem_Ball_L', 'salvage', {x=6, y=1, z=6})
+    InitializeMaterial('extra large salvage', 'PFB_SalvageItem_XL Variant', 'salvage', {x=7, y=1, z=7})
+    InitializeMaterial('compound 1', 'PFB_SalvageItem_Compound_Variant_1', 'salvage', {x=6, y=1, z=1})
+    InitializeMaterial('compound 2', 'PFB_SalvageItem_Compound_Variant_2', 'salvage', {x=6, y=1, z=1})
+    InitializeMaterial('compound 3', 'PFB_SalvageItem_Compound_3', 'salvage', {x=1, y=1, z=2})
     InitializeMaterial('explosive', 'PFB_SalvageItem_Explosive', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('medium explosive', 'PFB_SalvageItem_Explosive_M', 'salvage', {x=1, y=1, z=1})
-    InitializeMaterial('large salvage', 'PFB_SalvageItem_L Variant', 'salvage', {x=1, y=1, z=1})
+    InitializeMaterial('medium explosive', 'PFB_SalvageItem_Explosive_M', 'salvage', {x=1.5, y=1, z=1.5})
+    InitializeMaterial('large salvage', 'PFB_SalvageItem_L Variant', 'salvage', {x=6, y=1, z=6})
     InitializeMaterial('timed salvage', 'PFB_SalvageItem_Timed', 'salvage', {x=1, y=1, z=1})
     InitializeMaterial('power salvage', 'PFB_SalvageItemBuildPower', 'salvage', {x=1, y=1, z=1})
 
-    InitializeMaterial('small bush', 'PFB_INS_Savannah_Bush_Small', 'savannah', {x=1, y=1, z=1})
-    InitializeMaterial('short tree', 'PFB_INS_Savannah_Tree_Short', 'savannah', {x=1, y=1, z=1})
-    InitializeMaterial('brown short tree', 'PFB_INS_Savannah_Tree_Short_brown', 'savannah', {x=1, y=1, z=1})
+    InitializeMaterial('small bush', 'PFB_INS_Savannah_Bush_Small', 'savannah', {x=2.5, y=1, z=2.5})
+    InitializeMaterial('short tree', 'PFB_INS_Savannah_Tree_Short', 'savannah', {x=12, y=1, z=12})
+    InitializeMaterial('brown short tree', 'PFB_INS_Savannah_Tree_Short_brown', 'savannah', {x=12, y=1, z=12})
     InitializeMaterial('purple short tree', 'PFB_INS_Savannah_Tree_Short_Purple', 'savannah', {x=1, y=1, z=1})
     InitializeMaterial('yellow short tree', 'PFB_INS_Savannah_Tree_Short_Yellow', 'savannah', {x=1, y=1, z=1})
-    InitializeMaterial('tall tree', 'PFB_INS_Savannah_Tree_Tall', 'savannah', {x=1, y=1, z=1})
-    InitializeMaterial('tall brown tree', 'PFB_INS_Savannah_Tree_Tall_Brown', 'savannah', {x=1, y=1, z=1})
-    InitializeMaterial('tall purple tree', 'PFB_INS_Savannah_Tree_Tall_Purple', 'savannah', {x=1, y=1, z=1})
-    InitializeMaterial('tall yellow tree', 'PFB_INS_Savannah_Tree_Tall_Yellow', 'savannah', {x=1, y=1, z=1})
-    InitializeMaterial('tree', 'PFB_Savannah_Tree', 'savannah', {x=1, y=1, z=1})
+    InitializeMaterial('tall tree', 'PFB_INS_Savannah_Tree_Tall', 'savannah', {x=12, y=1, z=12})
+    InitializeMaterial('tall brown tree', 'PFB_INS_Savannah_Tree_Tall_Brown', 'savannah', {x=12, y=1, z=12})
+    InitializeMaterial('tall purple tree', 'PFB_INS_Savannah_Tree_Tall_Purple', 'savannah', {x=12, y=1, z=12})
+    InitializeMaterial('tall yellow tree', 'PFB_INS_Savannah_Tree_Tall_Yellow', 'savannah', {x=12, y=1, z=12})
+    InitializeMaterial('tree', 'PFB_Savannah_Tree', 'savannah', {x=14, y=1, z=14})
 
     InitializeMaterial('bottom desert', 'PFB_Cliff_Bottom_Desert', 'cliffs', {x=19, y=7, z=18})
-    InitializeMaterial('bottom desert grass', 'PFB_Cliff_Bottom_Desert_Grass', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('bottom mud', 'PFB_Cliff_Bottom_Mud', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('bottom mud grass', 'PFB_Cliff_Bottom_Mud_Grass', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('med desert', 'PFB_Cliff_Med_Desert', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('med desert grass', 'PFB_Cliff_Med_Desert_Grass', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('med mud', 'PFB_Cliff_Med_Mud', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('med mud grass', 'PFB_Cliff_Med_Mud_Grass', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('top desert', 'PFB_Cliff_Top_Desert', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('top desert grass', 'PFB_Cliff_Top_Desert_Grass', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('top desert trees', 'PFB_Cliff_Top_Desert_Trees', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('top mud', 'PFB_Cliff_Top_Mud', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('top mud grass', 'PFB_Cliff_Top_Mud_Grass', 'cliffs', {x=1, y=1, z=1})
-    InitializeMaterial('top mud trees', 'PFB_Cliff_Top_Mud_Trees', 'cliffs', {x=1, y=1, z=1})
+    InitializeMaterial('bottom desert grass', 'PFB_Cliff_Bottom_Desert_Grass', 'cliffs', {x=19, y=1, z=18})
+    InitializeMaterial('bottom mud', 'PFB_Cliff_Bottom_Mud', 'cliffs', {x=32, y=1, z=29})
+    InitializeMaterial('bottom mud grass', 'PFB_Cliff_Bottom_Mud_Grass', 'cliffs', {x=32, y=1, z=29})
+    InitializeMaterial('med desert', 'PFB_Cliff_Med_Desert', 'cliffs', {x=32, y=1, z=32})
+    InitializeMaterial('med desert grass', 'PFB_Cliff_Med_Desert_Grass', 'cliffs', {x=32, y=1, z=32})
+    InitializeMaterial('med mud', 'PFB_Cliff_Med_Mud', 'cliffs', {x=32, y=1, z=32})
+    InitializeMaterial('med mud grass', 'PFB_Cliff_Med_Mud_Grass', 'cliffs', {x=32, y=1, z=32})
+    InitializeMaterial('top desert', 'PFB_Cliff_Top_Desert', 'cliffs', {x=32, y=1, z=32})
+    InitializeMaterial('top desert grass', 'PFB_Cliff_Top_Desert_Grass', 'cliffs', {x=32, y=1, z=32})
+    InitializeMaterial('top desert trees', 'PFB_Cliff_Top_Desert_Trees', 'cliffs', {x=32, y=1, z=32})
+    InitializeMaterial('top mud', 'PFB_Cliff_Top_Mud', 'cliffs', {x=40, y=1, z=40})
+    InitializeMaterial('top mud grass', 'PFB_Cliff_Top_Mud_Grass', 'cliffs', {x=40, y=1, z=40})
+    InitializeMaterial('top mud trees', 'PFB_Cliff_Top_Mud_Trees', 'cliffs', {x=40, y=1, z=40})
 
-    InitializeMaterial('spiky canyon', 'PFB_SpikyCanyon_1', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('plate canyon', 'PFB_PlateCanyon_01', 'rocks', {x=1, y=1, z=1})
+    InitializeMaterial('spiky canyon', 'PFB_SpikyCanyon_1', 'rocks', {x=16, y=1, z=10})
+    InitializeMaterial('plate canyon', 'PFB_PlateCanyon_01', 'rocks', {x=5, y=1, z=5})
     InitializeMaterial('bush', 'PFB_Rock_Detail_Bush', 'rocks', {x=1, y=1, z=1})
     InitializeMaterial('med desert 1', 'PFB_Rock_Detail_Med_Desert_00', 'rocks', {x=1, y=1, z=1})
     InitializeMaterial('med desert grass 1', 'PFB_Rock_Detail_Med_Desert_00_Grass', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('med desert 2', 'PFB_Rock_Detail_Med_Desert_01', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('med desert grass 2', 'PFB_Rock_Detail_Med_Desert_01_Grass', 'rocks', {x=1, y=1, z=1})
+    InitializeMaterial('med desert 2', 'PFB_Rock_Detail_Med_Desert_01', 'rocks', {x=8, y=1, z=8})
+    InitializeMaterial('med desert grass 2', 'PFB_Rock_Detail_Med_Desert_01_Grass', 'rocks', {x=8, y=1, z=8})
     InitializeMaterial('med mud 1', 'PFB_Rock_Detail_Med_Mud_00', 'rocks', {x=1, y=1, z=1})
     InitializeMaterial('med mud grass 1', 'PFB_Rock_Detail_Med_Mud_00_Grass', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('med mud 2', 'PFB_Rock_Detail_Med_Mud_01', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('med mud grass 2', 'PFB_Rock_Detail_Med_Mud_01_Grass', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('med mud grass test', 'PFB_Rock_Detail_Med_Mud_01Test', 'rocks', {x=1, y=1, z=1})
+    InitializeMaterial('med mud 2', 'PFB_Rock_Detail_Med_Mud_01', 'rocks', {x=10.5, y=1, z=9.5})
+    InitializeMaterial('med mud grass 2', 'PFB_Rock_Detail_Med_Mud_01_Grass', 'rocks', {x=10.5, y=1, z=9.5})
+    InitializeMaterial('med mud grass test', 'PFB_Rock_Detail_Med_Mud_01Test', 'rocks', {x=10.5, y=1, z=9.5})
     InitializeMaterial('top desert', 'PFB_Rock_Detail_Top_Desert', 'rocks', {x=1, y=1, z=1})
     InitializeMaterial('top mud 1', 'PFB_Rock_Detail_Top_Mud', 'rocks', {x=1, y=1, z=1})
     InitializeMaterial('top mud 2', 'PFB_Rock_Detail_Top_Mud1', 'rocks', {x=1, y=1, z=1})
     InitializeMaterial('desert arc', 'PFB_Rock_Desert_Arc', 'rocks', {x=1, y=1, z=1})
     InitializeMaterial('med desert', 'PFB_Rock_Desert_Med', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('small desert', 'PFB_Rock_Desert_VerySmall', 'rocks', {x=1, y=1, z=1})
-    InitializeMaterial('large mud', 'PFB_Rock_Mud_Large', 'rocks', {x=1, y=1, z=1})
+    InitializeMaterial('small desert', 'PFB_Rock_Desert_VerySmall', 'rocks', {x=40, y=1, z=36})
+    InitializeMaterial('large mud', 'PFB_Rock_Mud_Large', 'rocks', {x=12, y=1, z=12})
 
-    InitializeMaterial('puzzle ball', 'PFB_MovePuzzleBall', 'balls', {x=1.5, y=1.5, z=1.5})
+    InitializeMaterial('puzzle ball', 'PFB_MovePuzzleBall', 'balls', {x=2, y=2, z=2})
     InitializeMaterial('twin flag', 'PFB_FlagTwin', 'misc', {x=1, y=1, z=1})
     InitializeMaterial('kungfu flag', 'PFB_KungfuFlaglol', 'misc', {x=1, y=1, z=1})
 
@@ -359,6 +359,12 @@ function HomePage(playerId)
         Label(playerId, "how to 5", "press Y to reset Cursor to Origin")
         Divider(playerId)
     end
+    if debug then
+        Divider(playerId)
+        for i, group in ipairs(MaterialCategories) do
+            Button(playerId, group, group, OnDebugSpawnGroup)
+        end
+    end
 end
 
 function ToggleHowToPage(callback)
@@ -386,6 +392,16 @@ function OnExpandGroup(callback)
     end
     Divider(callback.playerId)
     Button(callback.playerId, "back", "back", HomePage)
+end
+
+function OnDebugSpawnGroup(callback)
+    local Cursor = playerDataTable[callback.playerId].Cursor
+    local startPos = Cursor.pos
+    for i, material in ipairs(GetMaterialsCategory(callback.value)) do
+        local newPos = tm.vector3.Create(startPos.x + material.scale.x, startPos.y, startPos.z)
+        startPos = newPos
+        tm.physics.SpawnObject(newPos, material.model)
+    end
 end
 
 function Save(callback)
@@ -446,7 +462,7 @@ function LoadBuild(callback)
     for i, object in ipairs(data) do
         local model = object.model
         local transform = object.transform
-        local spawnedObject = tm.physics.SpawnObject(TableToVector(transform.pos), model)
+        local spawnedObject = SpawnProp(TableToVector(transform.pos), model)
         local spawnedTransform = spawnedObject.GetTransform()
         spawnedTransform.SetRotation(tm.quaternion.Create(TableToVector(transform.rot)))
         spawnedTransform.SetScale(TableToVector(transform.scale))
@@ -482,7 +498,8 @@ end
 function UpdateCursorPosition(cursor, pos)
     cursor.pos = pos
     for i = 1, #cursor.points do
-        cursor.points[i].GetTransform().SetPosition(UpdateCursorPoint(cursor, utils.signs[i]))
+        local pointPos = UpdateCursorPoint(cursor, utils.signs[i])
+        cursor.points[i].GetTransform().SetPosition(pointPos)
     end
 end
 
@@ -497,9 +514,8 @@ function InitializeCursor(cursor, pos)
     cursor.pos = pos
     cursor.origin = pos
     for i = 1, 4 do
-        local object = tm.physics.SpawnObject(
-            UpdateCursorPoint(cursor, utils.signs[i]), cursorModel
-        )
+        local spawnPos = UpdateCursorPoint(cursor, utils.signs[i])
+        local object = SpawnProp(spawnPos, cursorModel)
         object.GetTransform().SetScale(cursorSize)
         table.insert(cursor.points, i, object)
     end
@@ -653,15 +669,19 @@ function GetObjectAtPosition(Builder, pos)
     return nil
 end
 
+function SpawnProp(pos, model)
+    return tm.physics.SpawnObject(
+            pos,
+            model
+        )
+end
+
 function PlaceObject(Builder, Cursor)
     if IsPositionOccupied(Builder, Cursor.pos) then
         return
     end
-    for _ = 1, Builder.height do
-        local object = tm.physics.SpawnObject(
-            Cursor.pos,
-            Builder.material.model
-        )
+    for i = 1, Builder.height do
+        local object = SpawnProp(Cursor.pos, Builder.material.model)
         local objectData = MakeObject(object, Builder.material.model)
         table.insert(Builder.objects, objectData)
         table.insert(Builder.history, {action="place", object=objectData})
@@ -698,7 +718,7 @@ function OnMoveLeft(playerId)
     if not isBuilding(playerId) then
         return
     end
-    MoveCursor(Builder, Cursor, utils.directions.left.vector, 1.5)
+    MoveCursor(Builder, Cursor, utils.directions.left.vector, Builder.material.scale.x)
 end
 
 function OnMoveRight(playerId)
@@ -707,7 +727,7 @@ function OnMoveRight(playerId)
     if not isBuilding(playerId) then
         return
     end
-    MoveCursor(Builder, Cursor, utils.directions.right.vector, 1.5)
+    MoveCursor(Builder, Cursor, utils.directions.right.vector, Builder.material.scale.x)
 end
 
 function OnMoveForward(playerId)
@@ -716,7 +736,7 @@ function OnMoveForward(playerId)
     if not isBuilding(playerId) then
         return
     end
-    MoveCursor(Builder, Cursor, utils.directions.forward.vector, 1.5)
+    MoveCursor(Builder, Cursor, utils.directions.forward.vector, Builder.material.scale.z)
 end
 
 function OnMoveBack(playerId)
@@ -725,7 +745,7 @@ function OnMoveBack(playerId)
     if not isBuilding(playerId) then
         return
     end
-    MoveCursor(Builder, Cursor, utils.directions.back.vector, 1.5)
+    MoveCursor(Builder, Cursor, utils.directions.back.vector, Builder.material.scale.z)
 end
 
 function OnMoveUp(playerId)
@@ -734,7 +754,7 @@ function OnMoveUp(playerId)
     if not isBuilding(playerId) then
         return
     end
-    MoveCursor(Builder, Cursor, utils.directions.up.vector, 1.5)
+    MoveCursor(Builder, Cursor, utils.directions.up.vector, Builder.material.scale.y)
 end
 
 function OnMoveDown(playerId)
@@ -743,7 +763,7 @@ function OnMoveDown(playerId)
     if not isBuilding(playerId) then
         return
     end
-    MoveCursor(Builder, Cursor, utils.directions.down.vector, 1.5)
+    MoveCursor(Builder, Cursor, utils.directions.down.vector, Builder.material.scale.y)
 end
 
 ---------------------------------------------------------------------------------
@@ -776,7 +796,8 @@ function PackData(data)
 end
 
 function SaveData(filename, data)
-    local jsonData = json.serialize(PackData(data))
+    local packedData = PackData(data)
+    local jsonData = json.serialize(packedData)
     tm.os.WriteAllText_Dynamic(filename, jsonData)
 end
 
