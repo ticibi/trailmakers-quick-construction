@@ -1,11 +1,13 @@
---- Quick Construction ---
---- created by ticibi, dinoman, 2022 ---
+-- Quick Construction Mod for Trailmakers, ticibi 2022
+-- name: Quick Construction
+-- author: Thomas Bresee
+-- description: place, save, and load objects by moving a cursor around the world
+
 
 local debug = false
 local savedBuildPath = "MyBuilds"
 local playerDataTable = {}
 local cursorModel = 'PFB_BlockHunt'
-local cursorModelGreen = 'PFB_Beacon'
 local cursorOffset = 0.08
 local cursorSize = tm.vector3.Create(0.2, 0.0075, 0.2)
 local defaultCursorScale = tm.vector3.Create(1.5, 2, 1.5)
@@ -277,7 +279,7 @@ function AddKeybinds(player)
     tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveBack", "down")
     tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveUp", "page up")
     tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveDown", "page down")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnPlaceObject", "enter")
+    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnPlaceObject", "\\")
     tm.input.RegisterFunctionToKeyDownCallback(playerId, "rotateLeft", "home")
     tm.input.RegisterFunctionToKeyDownCallback(playerId, "rotateRight", "end")
     tm.input.RegisterFunctionToKeyDownCallback(playerId, "toggleDebug", "`")
@@ -353,7 +355,7 @@ function HomePage(playerId)
     if playerData.help then
         Label(playerId, "how to 1", "use ARROW keys to move Cursor")
         Label(playerId, "how to 2", "use Pg Up/Pg Down to raise/lower")
-        Label(playerId, "how to 3", "press ENTER to Place an object")
+        Label(playerId, "how to 3", "press \\ to Place an object")
         Label(playerId, "how to 4", "press E to rotate around Origin")
         Label(playerId, "how to 5", "press O to move Origin to Cursor")
         Label(playerId, "how to 5", "press Y to reset Cursor to Origin")
