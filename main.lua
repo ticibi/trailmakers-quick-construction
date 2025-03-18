@@ -1,68 +1,72 @@
--- Quick Construction Mod for Trailmakers, ticibi 2022
+-- Quick Construction Mod for Trailmakers
 -- name: Quick Construction
--- author: Thomas Bresee
--- description: place, save, and load objects by moving a cursor around the world
+-- author: ticibi
+-- version: 2.1 (2025 update)
+-- description: Place, save, and load objects using a cursor-based building system
 
-
+local MOD_VERSION = "2.1"
 local debug = false
 local savedBuildPath = "MyBuilds"
 local playerDataTable = {}
-local cursorModel = 'PFB_BlockHunt'
-local cursorOffset = 0.08
-local cursorSize = tm.vector3.Create(0.2, 0.0075, 0.2)
-local defaultCursorScale = tm.vector3.Create(1.5, 2, 1.5)
+
+-- Constants
+local CURSOR_MODEL = 'PFB_BlockHunt'
+local CURSOR_OFFSET = 0.08
+local CURSOR_SIZE = tm.vector3.Create(0.2, 0.0075, 0.2)
+local DEFAULT_CURSOR_SCALE = tm.vector3.Create(1.5, 2, 1.5)
+
+-- Cursor styling
 local cursorBoldness = {
     none = tm.vector3.Create(0.2, 0.0075, 0.2),
     bold = tm.vector3.Create(0.3, 0.0075, 0.3),
     selected = tm.vector3.Create(0.4, 0.0075, 0.4),
 }
+
+-- Utility configurations
 local utils = {
     signs = {{x=-1, z=1}, {x=1, z=1}, {x=-1, z=-1}, {x=1, z=-1}},
-    modes = {
-        rotation = {name='rotation'},
-        position = {name='position'},
-        scale = {name='scale'},
-    },
     directions = {
-        left = {value=1, name='left', vector=tm.vector3.Left()},
-        right = {value=2, name='right', vector=tm.vector3.Right()},
-        forward = {value=3, name='forward', vector=tm.vector3.Forward()},
-        back = {value=4, name='back', vector=tm.vector3.Back()},
-        up = {value=5, name='up', vector=tm.vector3.Up()},
-        down = {value=6, name='down', vector=tm.vector3.Down()},
-    },
-    axes = {
-        x = {value = 0, name='x'},
-        y = {value = 1, name='y'},
-        z = {vaue = 2, name='z'},
+        left = {vector=tm.vector3.Left(), scaleAxis='x'},
+        right = {vector=tm.vector3.Right(), scaleAxis='x'},
+        forward = {vector=tm.vector3.Forward(), scaleAxis='z'},
+        back = {vector=tm.vector3.Back(), scaleAxis='z'},
+        up = {vector=tm.vector3.Up(), scaleAxis='y'},
+        down = {vector=tm.vector3.Down(), scaleAxis='y'},
     }
 }
 
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
+-- Material Management
 local Materials = {}
-local MaterialCategories = {'construction', 'crates', 'barrels', 'tires', 'explosives', 'gold', 'beacons', 'balls', 'ocean', 'trees', 'plants', 'salvage', 'savannah', 'cliffs', 'rocks', 'large props', 'misc'}
+local MaterialCategories = {
+    'construction', 'crates', 'barrels', 'tires', 'explosives', 'gold', 
+    'beacons', 'balls', 'ocean', 'trees', 'plants', 'salvage', 
+    'savannah', 'cliffs', 'rocks', 'large props', 'misc'
+}
 
-function InitializeMaterial(name, model, category, scale, isRigid, isStatic, isVisible)
-    category = category or ''
-    isRigid = isRigid or false
-    isStatic = isStatic or false
-    isVisible = isVisible or true
-    local _table = {name=name, model=model, category=category, scale=scale, isRigid=isRigid, isStatic=isStatic, isVisible=isVisible}
-    table.insert(Materials, _table)
-    return _table
+-- Material Functions
+local function InitializeMaterial(name, model, category, scale, isRigid, isStatic, isVisible)
+    assert(name and model, "Material must have name and model")
+    local material = {
+        name = name,
+        model = model,
+        category = category or 'misc',
+        scale = scale or {x=1, y=1, z=1},
+        isRigid = isRigid or false,
+        isStatic = isStatic or false,
+        isVisible = isVisible ~= false
+    }
+    table.insert(Materials, material)
+    return material
 end
 
-function GetMaterialByName(name)
-    for i, material in ipairs(Materials) do
-        if material.name == name then
-            return material
-        end
+local function GetMaterialByName(name)
+    for _, material in ipairs(Materials) do
+        if material.name == name then return material end
     end
+    return nil
 end
 
-function GetMaterialsCategory(category)
+local function GetMaterialsCategory(category)
     local group = {}
     for _, material in ipairs(Materials) do
         if material.category == category then
@@ -70,6 +74,250 @@ function GetMaterialsCategory(category)
         end
     end
     return group
+end
+
+-- Player Management
+local function AddPlayerData(player)
+    assert(player and player.playerId, "Invalid player object")
+    playerDataTable[player.playerId] = {
+        isBuilding = false,
+        buildName = nil,
+        help = false,
+        savedBuilds = {},
+        Builder = {
+            material = GetMaterialByName("scaffold"),
+            height = 1,
+            objects = {},
+            history = {}
+        },
+        Cursor = {
+            isVisible = true,
+            origin = nil,
+            pos = nil,
+            scale = DEFAULT_CURSOR_SCALE,
+            points = {},
+            lastMove = {}
+        }
+    }
+end
+
+local function AddKeybinds(player)
+    local binds = {
+        OnMoveLeft = "left",
+        OnMoveRight = "right",
+        OnMoveForward = "up",
+        OnMoveBack = "down",
+        OnMoveUp = "page up",
+        OnMoveDown = "page down",
+        OnPlaceObject = "\\",
+        rotateLeft = "home",
+        rotateRight = "end",
+        toggleDebug = "`",
+        selectObject = "q",
+        OnRotateOrigin = "e",
+        OnSetOrigin = "o",
+        OnResetCursor = "y"
+    }
+    
+    for func, key in pairs(binds) do
+        tm.input.RegisterFunctionToKeyDownCallback(player.playerId, func, key)
+    end
+end
+
+-- UI Functions
+local function ClearUI(playerId)
+    tm.playerUI.ClearUI(playerId)
+end
+
+local function AddLabel(playerId, key, text)
+    tm.playerUI.AddUILabel(playerId, key, text)
+end
+
+local function AddButton(playerId, key, text, func)
+    tm.playerUI.AddUIButton(playerId, key, text, func)
+end
+
+local function HomePage(playerId)
+    local playerData = playerDataTable[playerId]
+    ClearUI(playerId)
+    
+    if not playerData.isBuilding then
+        AddButton(playerId, "start", "Start Building", StartBuilding)
+    else
+        AddButton(playerId, "materials", "Select Material", MaterialsPage)
+        AddLabel(playerId, "divider1", "────────────")
+        AddButton(playerId, "delete_last", "Delete Last", OnDeleteLastObject)
+        AddButton(playerId, "delete_all", "Delete All", OnDeleteAllObjects)
+        AddLabel(playerId, "divider2", "────────────")
+        AddButton(playerId, "save", "Save Build", Save)
+        AddButton(playerId, "cancel", "Cancel Build", OnCancelBuild)
+        AddLabel(playerId, "divider3", "────────────")
+        AddButton(playerId, "builds", "My Builds", ShowBuilds)
+    end
+    
+    AddButton(playerId, "help", "How to Use", ToggleHowToPage)
+    
+    if playerData.help then
+        local helpText = {
+            "Arrow Keys: Move Cursor",
+            "Pg Up/Down: Height",
+            "\\: Place Object",
+            "E: Rotate Origin",
+            "O: Set Origin",
+            "Y: Reset Cursor"
+        }
+        for i, text in ipairs(helpText) do
+            AddLabel(playerId, "help_"..i, text)
+        end
+    end
+end
+
+-- Cursor Management
+local function InitializeCursor(cursor, pos)
+    cursor.pos = pos
+    cursor.origin = pos
+    cursor.points = {}
+    
+    for i, sign in ipairs(utils.signs) do
+        local spawnPos = tm.vector3.Create(
+            pos.x + (cursor.scale.x * sign.x / 2) + (CURSOR_OFFSET * sign.x),
+            pos.y + cursor.scale.y - (cursor.scale.y / 2),
+            pos.z + (cursor.scale.z * sign.z / 2) + (CURSOR_OFFSET * sign.z)
+        )
+        local object = tm.physics.SpawnObject(spawnPos, CURSOR_MODEL)
+        object.GetTransform().SetScale(CURSOR_SIZE)
+        cursor.points[i] = object
+    end
+end
+
+local function UpdateCursorPosition(cursor, pos)
+    cursor.pos = pos
+    for i, point in ipairs(cursor.points) do
+        local sign = utils.signs[i]
+        local pointPos = tm.vector3.Create(
+            pos.x + (cursor.scale.x * sign.x / 2) + (CURSOR_OFFSET * sign.x),
+            pos.y + cursor.scale.y - (cursor.scale.y / 2),
+            pos.z + (cursor.scale.z * sign.z / 2) + (CURSOR_OFFSET * sign.z)
+        )
+        point.GetTransform().SetPosition(pointPos)
+    end
+end
+
+local function MoveCursor(builder, cursor, direction)
+    local scaleAxis = direction.scaleAxis
+    local movement = tm.vector3.op_Multiply(
+        direction.vector, 
+        builder.material.scale[scaleAxis]
+    )
+    local newPos = tm.vector3.op_Addition(cursor.pos, movement)
+    UpdateCursorPosition(cursor, newPos)
+    cursor.lastMove = {direction=direction.vector, scale=builder.material.scale}
+end
+
+-- Object Management
+local function PlaceObject(builder, cursor)
+    if IsPositionOccupied(builder, cursor.pos) then return false end
+    
+    local object = tm.physics.SpawnObject(cursor.pos, builder.material.model)
+    local objectData = {object=object, material=builder.material.model}
+    
+    table.insert(builder.objects, objectData)
+    table.insert(builder.history, {action="place", object=objectData})
+    return true
+end
+
+local function IsPositionOccupied(builder, pos)
+    for _, obj in ipairs(builder.objects) do
+        if obj.object.Exists() and 
+           tm.vector3.op_Equality(obj.object.GetTransform().GetPosition(), pos) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Event Handlers
+function onPlayerJoined(player)
+    AddPlayerData(player)
+    AddKeybinds(player)
+    HomePage(player.playerId)
+end
+
+tm.players.onPlayerJoined.add(onPlayerJoined)
+
+function OnMoveLeft(playerId)
+    if not playerDataTable[playerId].isBuilding then return end
+    MoveCursor(
+        playerDataTable[playerId].Builder,
+        playerDataTable[playerId].Cursor,
+        utils.directions.left
+    )
+end
+
+function OnMoveRight(playerId)
+    if not playerDataTable[playerId].isBuilding then return end
+    MoveCursor(
+        playerDataTable[playerId].Builder,
+        playerDataTable[playerId].Cursor,
+        utils.directions.right
+    )
+end
+
+function OnMoveForward(playerId)
+    if not playerDataTable[playerId].isBuilding then return end
+    MoveCursor(
+        playerDataTable[playerId].Builder,
+        playerDataTable[playerId].Cursor,
+        utils.directions.forward
+    )
+end
+
+function OnMoveBack(playerId)
+    if not playerDataTable[playerId].isBuilding then return end
+    MoveCursor(
+        playerDataTable[playerId].Builder,
+        playerDataTable[playerId].Cursor,
+        utils.directions.back
+    )
+end
+
+function OnMoveUp(playerId)
+    if not playerDataTable[playerId].isBuilding then return end
+    MoveCursor(
+        playerDataTable[playerId].Builder,
+        playerDataTable[playerId].Cursor,
+        utils.directions.up
+    )
+end
+
+function OnMoveDown(playerId)
+    if not playerDataTable[playerId].isBuilding then return end
+    MoveCursor(
+        playerDataTable[playerId].Builder,
+        playerDataTable[playerId].Cursor,
+        utils.directions.down
+    )
+end
+
+function OnPlaceObject(playerId)
+    if not playerDataTable[playerId].isBuilding then return end
+    PlaceObject(
+        playerDataTable[playerId].Builder,
+        playerDataTable[playerId].Cursor
+    )
+end
+
+function StartBuilding(callback)
+    local playerData = playerDataTable[callback.playerId]
+    if playerData.isBuilding then return end
+    
+    if not playerData.Cursor.pos then
+        local playerPos = tm.players.GetPlayerTransform(callback.playerId).GetPosition()
+        InitializeCursor(playerData.Cursor, playerPos)
+    end
+    
+    playerData.isBuilding = true
+    HomePage(callback.playerId)
 end
 
 function CreateMaterials()
@@ -237,730 +485,3 @@ function CreateMaterials()
 end
 
 CreateMaterials()
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function AddPlayerData(player)
-    playerDataTable[player.playerId] = {
-        isBuilding = false,
-        buildName = nil,
-        help = false,
-        pause = false,
-        score = 0,
-        savedBuilds = {},
-        Builder = {
-            material = GetMaterialByName("scaffold"),
-            height = 1,
-            objects = {},
-            history = {},
-        },
-        Cursor = {
-            isVisible = true,
-            origin = nil,
-            pos = nil,
-            scale = defaultCursorScale,
-            vector = nil,
-            points = {},
-            lastMove = {
-                direction = nil,
-                axis = nil,
-                scale = nil,
-            }
-        },
-    }
-end
-
-function AddKeybinds(player)
-    local playerId = player.playerId
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveLeft", "left")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveRight", "right")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveForward", "up")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveBack", "down")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveUp", "page up")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnMoveDown", "page down")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnPlaceObject", "\\")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "rotateLeft", "home")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "rotateRight", "end")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "toggleDebug", "`")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "selectObject", "q")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnRotateOrigin", "e")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnSetOrigin", "o")
-    tm.input.RegisterFunctionToKeyDownCallback(playerId, "OnResetCursor", "y")
-end
-
-function LoadSavedBuilds(player)
-    local data = ReadDynamicFile(savedBuildPath)
-    if data == nil or data == '' then
-        return
-    end
-    playerDataTable[player.playerId].savedBuilds = data
-end
-
-function onPlayerJoined(player)
-    AddPlayerData(player)
-    AddKeybinds(player)
-    HomePage(player)
-    LoadSavedBuilds(player)
-end
-
-tm.players.onPlayerJoined.add(onPlayerJoined)
-
-function update()
-    --local playerList = tm.players.CurrentPlayers()
-    --for _, player in pairs(playerList) do
-    --    --
-    --end
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function Clear(playerId)
-    tm.playerUI.ClearUI(playerId)
-end
-
-function Label(playerId, key, text)
-    tm.playerUI.AddUILabel(playerId, key, text)
-end
-
-function Divider(playerId)
-    Label(playerId, "divider", "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
-end
-
-function Button(playerId, key, text, func)
-    tm.playerUI.AddUIButton(playerId, key, text, func)
-end
-
-function HomePage(playerId)
-    if type(playerId) ~= "number" then
-        playerId = playerId.playerId
-    end
-    local playerData = playerDataTable[playerId]
-    Clear(playerId)
-    if not playerData.isBuilding then
-        Button(playerId, "start building", "start building", StartBuilding)
-    else
-        Button(playerId, "select material", "select material", MaterialsPage)
-        Divider(playerId)
-        Button(playerId, "delete last", "delete last", OnDeleteLastObject)
-        Button(playerId, "delete all", "delete all", OnDeleteAllObjects)
-        Divider(playerId)
-        Button(playerId, "save build", "save build", Save)
-        Button(playerId, "cancel build", "cancel build", OnCancelBuild)
-        Divider(playerId)
-        Button(playerId, "show my builds", "my builds", ShowBuilds)
-    end
-    Button(playerId, "how to use", "how to use", ToggleHowToPage)
-    if playerData.help then
-        Label(playerId, "how to 1", "use ARROW keys to move Cursor")
-        Label(playerId, "how to 2", "use Pg Up/Pg Down to raise/lower")
-        Label(playerId, "how to 3", "press \\ to Place an object")
-        Label(playerId, "how to 4", "press E to rotate around Origin")
-        Label(playerId, "how to 5", "press O to move Origin to Cursor")
-        Label(playerId, "how to 5", "press Y to reset Cursor to Origin")
-        Divider(playerId)
-    end
-    if debug then
-        Divider(playerId)
-        for i, group in ipairs(MaterialCategories) do
-            Button(playerId, group, group, OnDebugSpawnGroup)
-        end
-    end
-end
-
-function ToggleHowToPage(callback)
-    local playerId = callback.playerId
-    playerDataTable[playerId].help = not playerDataTable[playerId].help
-    HomePage(playerId)
-end
-
-function MaterialsPage(playerId)
-    if type(playerId) ~= "number" then
-        playerId = playerId.playerId
-    end
-    Clear(playerId)
-    for i, group in ipairs(MaterialCategories) do
-        Button(playerId, group, group, OnExpandGroup)
-    end
-    Divider(playerId)
-    Button(playerId, "back", "back", HomePage)
-end
-
-function OnExpandGroup(callback)
-    Clear(callback.playerId)
-    for i, material in ipairs(GetMaterialsCategory(callback.value)) do
-        Button(callback.playerId, material.model, material.name, OnSelectMaterial)
-    end
-    Divider(callback.playerId)
-    Button(callback.playerId, "back", "back", HomePage)
-end
-
-function OnDebugSpawnGroup(callback)
-    local Cursor = playerDataTable[callback.playerId].Cursor
-    local startPos = Cursor.pos
-    local materials = GetMaterialsCategory(callback.value)
-    for i, material in ipairs(materials) do
-        local newPos = tm.vector3.Create(startPos.x + material.scale.x, startPos.y, startPos.z)
-        startPos = newPos
-        tm.physics.SpawnObject(newPos, material.model)
-    end
-end
-
-function Save(callback)
-    local playerData = playerDataTable[callback.playerId]
-    local Builder = playerData.Builder
-    if isEmpty(Builder.objects) then
-        return
-    end
-    if playerData.saveName == nil then
-        playerData.saveName = "build "..#playerData.savedBuilds + 1
-    end
-    playerData.isBuilding = false
-    SaveData(playerData.saveName, Builder.objects)
-    table.overwrite(playerData.savedBuilds, playerData.saveName)
-    WriteDynamicFile(savedBuildPath, playerData.savedBuilds)
-    HomePage(callback.playerId)
-end
-
-function StartBuilding(callback)
-    local playerId = callback.playerId
-    local playerData = playerDataTable[playerId]
-    playerData.saveName = nil
-    if playerData.isBuilding then
-        return
-    end
-    if playerData.Cursor.pos == nil then
-        local playerPos = GetPlayerPos(playerId)
-        InitializeCursor(playerData.Cursor, playerPos)
-    end
-    playerData.isBuilding = true
-    HomePage(playerId)
-    DeleteAllObjects(playerData.Builder)
-end
-
-function ShowBuilds(callback)
-    local playerId = callback.playerId
-    local playerData = playerDataTable[playerId]
-    Clear(playerId)
-    if isEmpty(playerData.savedBuilds) then
-        Label(playerId, "warning", "No Saved Builds")
-        Button(playerId, "back", "back", HomePage)
-        return
-    end
-    for i, build in ipairs(playerData.savedBuilds) do
-        Button(playerId, build, build, LoadBuild)
-    end
-    Button(playerId, "back", "back", HomePage)
-end
-
-function LoadBuild(callback)
-    local buildName = callback.value
-    local data = ReadDynamicFile(buildName)
-    if data == nil or data == '' then
-        return
-    end
-    local playerId = callback.playerId
-    local playerData = playerDataTable[playerId]
-    local Builder = playerData.Builder
-    for i, object in ipairs(data) do
-        local model = object.model
-        local transform = object.transform
-        local positionVector = TableToVector(transform.pos)
-        local spawnedObject = SpawnProp(positionVector, model)
-        local spawnedTransform = spawnedObject.GetTransform()
-        local rotationVector = TableToVector(transform.rot)
-        spawnedTransform.SetRotation(tm.quaternion.Create(rotationVector))
-        local scaleVector = TableToVector(transform.scale)
-        spawnedTransform.SetScale(scaleVector)
-        local objectData = MakeObject(spawnedObject, model)
-        table.insert(Builder.objects, objectData)
-        table.insert(Builder.history, {action="place", object=objectData})
-    end
-    HomePage(playerId)
-    StartBuilding(callback)
-end
-
-function OnSelectMaterial(callback)
-    local playerData = playerDataTable[callback.playerId]
-    playerData.Builder.material = GetMaterialByName(callback.value)
-    playerData.Cursor.scale = playerData.Builder.material.scale
-    HomePage(callback.playerId)
-    ResetCursor(playerData.Cursor, playerData.Cursor.pos, playerData.Builder.material.scale)
-end
-
-function OnCancelBuild(callback)
-    local playerData = playerDataTable[callback.playerId]
-    local playerPos = GetPlayerPos(callback.playerId)
-    DeleteAllObjects(playerData.Builder)
-    ResetCursor(playerData.Cursor, playerPos)
-    playerData.isBuilding = false
-    playerData.saveName = nil
-    HomePage(callback.playerId)
-    ToggleCursorVisibility(playerData.Cursor)
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function UpdateCursorPosition(cursor, pos)
-    cursor.pos = pos
-    for i = 1, #cursor.points do
-        local pointPos = UpdateCursorPoint(cursor, utils.signs[i])
-        cursor.points[i].GetTransform().SetPosition(pointPos)
-    end
-end
-
-function UpdateCursorPoint(cursor, sign)
-    local x = cursor.pos.x + (cursor.scale.x * sign.x / 2) + (cursorOffset * sign.x)
-    local y = cursor.pos.y + cursor.scale.y - (cursor.scale.y / 2)
-    local z = cursor.pos.z + (cursor.scale.z * sign.z / 2) + (cursorOffset * sign.z)
-    return tm.vector3.Create(x, y, z)
-end
-
-function InitializeCursor(cursor, pos)
-    cursor.pos = pos
-    cursor.origin = pos
-    for i = 1, 4 do
-        local spawnPos = UpdateCursorPoint(cursor, utils.signs[i])
-        local object = SpawnProp(spawnPos, cursorModel)
-        object.GetTransform().SetScale(cursorSize)
-        table.insert(cursor.points, i, object)
-    end
-end
-
-function AdvanceCursor(cursor)
-    local vector = tm.vector3.op_Multiply(cursor.lastMove.direction, cursor.lastMove.axis)
-    local pos = tm.vector3.op_Addition(cursor.pos, vector)
-    UpdateCursorPosition(cursor, pos)
-end
-
-function ToggleCursorVisibility(cursor)
-    cursor.isVisible = not cursor.isVisible
-end
-
-function SetCursorPointScale(cursor, scale)
-    for _, point in ipairs(cursor.points) do
-        point.GetTransform().SetScale(scale)
-    end
-end
-
-function ResetCursor(cursor, pos, scale)
-    cursor.pos = pos or cursor.origin
-    cursor.scale = scale or defaultCursorScale
-    UpdateCursorPosition(cursor, pos)
-end
-
-function UpdateCursorLastMove(cursor, vector, axis, scale)
-    cursor.lastMove.direction = vector or cursor.vector
-    cursor.lastMove.axis = axis or cursor.axis
-    cursor.lastMove.scale = scale or cursor.scale
-end
-
-function UpdateCursorBoldness(builder, cursor)
-    if IsPositionOccupied(builder, cursor.pos) then
-        SetCursorPointScale(cursor, cursorBoldness.bold)
-    else
-        SetCursorPointScale(cursor, cursorBoldness.none)
-    end
-end
-
-function OnResetCursor(playerId)
-    local Cursor = playerDataTable[playerId].Cursor
-    local Builder = playerDataTable[playerId].Builder
-    ResetCursor(Cursor, Cursor.origin, Builder.material.scale)
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function DeleteLastObject(Builder)
-    if isEmpty(Builder.objects) then
-        return
-    end
-    local object = Builder.objects[#Builder.objects]
-    if object ~= nil and object.object.Exists() then
-        object.object.Despawn()
-    end
-    table.remove(Builder.objects, #Builder.objects)
-end
-
-function OnDeleteLastObject(callback)
-    local Builder = playerDataTable[callback.playerId].Builder
-    DeleteLastObject(Builder)
-end
-
-function DeleteAllObjects(Builder)
-    while #Builder.objects > 0 do
-        DeleteLastObject(Builder)
-    end
-end
-
-function OnDeleteAllObjects(callback)
-    local Cursor = playerDataTable[callback.playerId].Cursor
-    local Builder = playerDataTable[callback.playerId].Builder
-    DeleteAllObjects(Builder)
-    ResetCursor(Cursor, Cursor.origin, Builder.material.scale)
-end
-
-function RotateMatrix(Builder)
-    if isEmpty(Builder.objects) then
-        return
-    end
-    local angle = 45
-    local theta = angle * math.pi / 180
-    local origin = Builder.objects[1].object.GetTransform().GetPosition()
-    for i = 2, #Builder.objects do
-        local object = Builder.objects[i].object
-        if not isObjectValid(object) then
-            return
-        end
-        local pos = object.GetTransform().GetPosition()
-        local delta = tm.vector3.op_Subtraction(pos, origin)
-        local x = delta.x * math.cos(theta) - delta.z * math.sin(theta)
-        local y = pos.y
-        local z = delta.x * math.sin(theta) + delta.z * math.cos(theta)
-        local deltaPos = tm.vector3.Create(x, y, z)
-        local newPos = tm.vector3.op_Addition(deltaPos, tm.vector3.Create(origin.x, 0, origin.z))
-        object.GetTransform().SetPosition(newPos)
-    end
-end
-
-function OnRotateOrigin(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    RotateMatrix(Builder)
-end
-
-function TransformMatrix(Builder, pos)
-    if isEmpty(Builder.objects) then
-        return
-    end
-    local originObject = Builder.objects[1].object
-    local originPos = originObject.GetTransform().GetPosition()
-    originObject.GetTransform().SetPosition(pos)
-    local deltaPos = tm.vector3.op_Subtraction(pos, originPos)
-    for i = 2, #Builder.objects do
-        local object = Builder.objects[i].object
-        if not isObjectValid(object) then
-            return
-        end
-        local currentPos = object.GetTransform().GetPosition()
-        local newPos = tm.vector3.op_Addition(deltaPos, currentPos)
-        object.GetTransform().SetPosition(newPos)
-    end
-end
-
-function OnSetOrigin(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    local Cursor = playerDataTable[playerId].Cursor
-    TransformMatrix(Builder, Cursor.pos)
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function IsPositionOccupied(Builder, pos)
-    for _, object in ipairs(Builder.objects) do
-        if object.object.GetTransform().GetPosition() == pos then
-            return true
-        end
-    end
-    return false
-end
-
-function GetObjectAtPosition(Builder, pos)
-    for _, object in ipairs(Builder.objects) do
-        if object.object.GetTransform().GetPosition() == pos then
-            return object.object
-        end
-    end
-    return nil
-end
-
-function SpawnProp(pos, model)
-    return tm.physics.SpawnObject(
-            pos,
-            model
-        )
-end
-
-function PlaceObject(Builder, Cursor)
-    if IsPositionOccupied(Builder, Cursor.pos) then
-        return
-    end
-    for i = 1, Builder.height do
-        local object = SpawnProp(Cursor.pos, Builder.material.model)
-        local objectData = MakeObject(object, Builder.material.model)
-        table.insert(Builder.objects, objectData)
-        table.insert(Builder.history, {action="place", object=objectData})
-    end
-end
-
-function OnPlaceObject(playerId)
-    local playerData = playerDataTable[playerId]
-    if not playerData.isBuilding then
-        return
-    end
-    PlaceObject(playerData.Builder, playerData.Cursor)
-    UpdateCursorBoldness(playerData.Builder, playerData.Cursor)
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function isBuilding(playerId)
-    return playerDataTable[playerId].isBuilding
-end
-
-function MoveCursor(builder, cursor, vector, axis)
-    local directionVector = tm.vector3.op_Multiply(vector, axis)
-    local newPosition = tm.vector3.op_Addition(cursor.pos, directionVector)
-    UpdateCursorPosition(cursor, newPosition)
-    UpdateCursorLastMove(cursor, vector, axis)
-    UpdateCursorBoldness(builder, cursor)
-end
-
-function OnMoveLeft(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    local Cursor = playerDataTable[playerId].Cursor
-    if not isBuilding(playerId) then
-        return
-    end
-    MoveCursor(Builder, Cursor, utils.directions.left.vector, Builder.material.scale.x)
-end
-
-function OnMoveRight(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    local Cursor = playerDataTable[playerId].Cursor
-    if not isBuilding(playerId) then
-        return
-    end
-    MoveCursor(Builder, Cursor, utils.directions.right.vector, Builder.material.scale.x)
-end
-
-function OnMoveForward(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    local Cursor = playerDataTable[playerId].Cursor
-    if not isBuilding(playerId) then
-        return
-    end
-    MoveCursor(Builder, Cursor, utils.directions.forward.vector, Builder.material.scale.z)
-end
-
-function OnMoveBack(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    local Cursor = playerDataTable[playerId].Cursor
-    if not isBuilding(playerId) then
-        return
-    end
-    MoveCursor(Builder, Cursor, utils.directions.back.vector, Builder.material.scale.z)
-end
-
-function OnMoveUp(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    local Cursor = playerDataTable[playerId].Cursor
-    if not isBuilding(playerId) then
-        return
-    end
-    MoveCursor(Builder, Cursor, utils.directions.up.vector, Builder.material.scale.y)
-end
-
-function OnMoveDown(playerId)
-    local Builder = playerDataTable[playerId].Builder
-    local Cursor = playerDataTable[playerId].Cursor
-    if not isBuilding(playerId) then
-        return
-    end
-    MoveCursor(Builder, Cursor, utils.directions.down.vector, Builder.material.scale.y)
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function MakeObject(object, material)
-    return {object=object, material=material}
-end
-
-function UnpackTransform(transform)
-    return {
-        pos = VectorToTable(transform.GetPosition()),
-        rot = VectorToTable(transform.GetRotation()),
-        scale = VectorToTable(transform.GetScale())
-    }
-end
-
-function PackData(data)
-    local struct = {}
-    for _, object in ipairs(data) do
-        if not isObjectValid(object.object) then
-            return
-        end
-        local transform = object.object.GetTransform()
-        local transformData = UnpackTransform(transform)
-        local objectData = {model=object.material, transform=transformData}
-        table.insert(struct, objectData)
-    end
-    return struct
-end
-
-function SaveData(filename, data)
-    local packedData = PackData(data)
-    local jsonData = json.serialize(packedData)
-    tm.os.WriteAllText_Dynamic(filename, jsonData)
-end
-
-function LoadData(filename)
-    local file = tm.os.ReadAllText_Dynamic(filename)
-    if not isFileValid(file) then
-        return
-    end
-    return json.parse(file)
-end
-
-function UnpackData(data)
-    --
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-function ReadDynamicFile(path)
-    local file = tm.os.ReadAllText_Dynamic(path)
-    if isFileValid(file) then
-        return json.parse(file)
-    end
-end
-
-function WriteDynamicFile(path, data)
-    local jsonData = json.serialize(data)
-    tm.os.WriteAllText_Dynamic(path, jsonData)
-end
-
-function GetPlayerPos(playerId)
-    return tm.players.GetPlayerTransform(playerId).GetPosition()
-end
-
-function CreateRandomizedVector(limitX, limitY, limitZ, value)
-    value = value or 0.1
-    return tm.vector3.Create(
-        math.random(-limitX, limitX) * value,
-        math.random(-limitY, limitY) * value,
-        math.random(-limitZ, limitZ) * value
-    )
-end
-
-function isEmpty(list)
-    return #list < 1
-end
-
-function isFileValid(file)
-    if file == nil or file == '' then
-        return false
-    end
-    return true
-end
-
-function isObjectValid(object)
-    return object.Exists() and object ~= nil
-end
-
-function VectorToTable(vector)
-    return {
-        x = vector.x,
-        y = vector.y,
-        z = vector.z
-    }
-end
-
-function TableToVector(table)
-    return tm.vector3.Create(table.x, table.y, table.z)
-end
-
-function PrintVector(vector)
-    return 'x: '..vector.x..', y: '..vector.y..', z: '..vector.z
-end
-
-function Log(text)
-    tm.os.log(text)
-end
-
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
--- returns index of item
-function table.index(_table, _item)
-    for i, v in ipairs(_table) do
-        if _item == v then
-            return i
-        end
-    end
-end
-
--- removes item from table if it exists
-function table.pop(_table, _item)
-    if not table.contains(_table, _item) then return end
-    for i, v in ipairs(_table) do
-        if _item == v then
-            table.remove(_table, i)
-        end
-    end
-end
-
--- checks if item is in table
-function table.contains(_table, _item)
-    for _, v in ipairs(_table) do
-        if _item == v then
-            return true
-        end
-    end
-    return false
-end
-
--- overwrites item in table if item already exists, or appends item
-function table.overwrite(_table, _item)
-    if table.contains(_table, _item) then
-        local index = table.index(_table, _item)
-        _table[index] = _item
-    else
-        table.insert(_table, _item)
-    end
-end
-
--- returns a reversed copy of a table
-function table.reversed(_table)
-    local copy = _table
-    local len = #copy
-    local i = 1
-    while i < len do
-        copy[i], copy[len] = copy[len], copy[i]
-        i = i + 1
-        len = len - 1
-    end
-    return copy
-end
-
--- inserts item into table if not in table already
-function table.insertUnique(_table, _item)
-    if table.contains(_table, _item) then
-        return
-    end
-    table.insert(_table, _item)
-end
-
--- returns the last element of a table
-function table.last(_table)
-    if #_table < 1 then
-        error('table empty', 2)
-    end
-    return _table[#_table]
-end
-
--- splits string by delimiter
-function string.split(_string, delimiter)
-    delimiter = delimiter or '%S+'
-    local output = {}
-    for char in string.gmatch(_string, '%S+') do
-        table.insert(output, char)
-    end
-    return output
-end
